@@ -6,21 +6,20 @@ class Server{
         this.port = process.env.PORT || 3000   ; //SI LO USAMOS LOCALMENTE DEBE PONERSE PRIMERO PUERTO Y LUEGO EL DE VARIABLE DE ENTORNO. EN HEROKU AL REVÉS.
         //this.port = 8080;
         this.app = express();
+        //WebSocket 
+        this.server = require('http').createServer(this.app)
+        this.io = require('socket.io')(this.server);
+        
          //Middlewares - Funcion que se ejecuta siempre que levantamos el servidor.
         this.middlewares();
         
-        this.paths = {
-            auth: '/api/auth',
-            buscar: '/api/buscar',
-            categorias: '/api/categorias',
-            usuarios: '/api/usuarios',
-            productos: '/api/productos',
-            uploads: '/api/uploads'
-            
-        }
+        this.paths = {}
         
         //Rutas de mi aplicacion
         this.routes();
+
+        //Sockets
+        this.sockets();
     }
 
 
@@ -39,9 +38,26 @@ class Server{
        
     }
 
+    sockets(){
+        this.io.on("connection", (socket) => {
+           console.log('Cliente conectado ', socket.id);
+           
+            socket.on('disconnect', () =>{
+                console.log('Cliente desconectado ', socket.id)
+            })
+
+            socket.on('enviar-mensaje', (payload) =>{
+                console.log(payload)
+            })
+
+        });
+    }
+
     listen(){
-        this.app.listen(this.port, () =>{
+        this.server.listen(this.port, () =>{
             console.log("Servidor corriendo en el puerto:", this.port);
+
+            
         });
     }
 
