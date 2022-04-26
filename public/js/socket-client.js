@@ -20,8 +20,22 @@ socket.on('disconnect', ()=>{
     lblOffline.style.display = "block";
 })
 
+socket.on('enviar-mensaje', (payload)=>{
+    console.log("El servidor respondio: ", payload);
+})
+
 
 btnEnviar.addEventListener('click', ()=>{
-    const mensaje = txtMensaje.value;
-    socket.emit('enviar-mensaje', mensaje);
+   const mensaje = txtMensaje.value;
+   const payload ={
+        mensaje: mensaje,
+        id: '123ABC',
+        fecha: new Date().getTime()
+    }
+   
+    
+    socket.emit('enviar-mensaje', payload, (id) =>{
+        console.log("Desde el server", id);
+    });
+    
 })
